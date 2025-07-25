@@ -27,7 +27,7 @@ local function prompt()
             "center",
             w = 50
         }, -- TODO: remove
-        realtime = true,
+        realtime = false,
         debounce = 0.1
     }
 end
