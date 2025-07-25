@@ -65,7 +65,7 @@ local function entry()
     -- 3. Construct the full command string for the shell.
 	-- This correctly builds the `es ... | fzf ...` pipeline.
 	-- Using -path with es.exe scopes the search.
-	local fzf_options = "--ansi --exact --no-sort --reverse"
+	local fzf_options = "--ansi --no-sort --reverse"
 	local full_command = string.format('es.exe -path "%s" "%s" | fzf.exe %s', current_dir, query, fzf_options)
 
 	-- Optional: A notification to debug the exact command being run.
