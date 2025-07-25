@@ -26,6 +26,19 @@ end
 local function entry()
 	local input = prompt()
 
+	local query, event = input:recv()
+
+    -- Check if the user cancelled or provided an empty query.
+    if not query or query:len() == 0 then
+        ya.notify({
+            title = "Search Cancelled",
+            content = "No search query provided. Operation aborted.",
+            level = "info",
+            timeout = 5,
+        })
+        return -- Exit the plugin
+    end
+
 	-- while true do
 	-- 	local value, event = input:recv()
 	-- 	if event ~= 1 and event ~= 3 then
