@@ -42,13 +42,12 @@ local function entry()
     -- We use 'cmd.exe /C' to ensure the pipe (`|`) works correctly on Windows.
     -- 'es.exe' searches for the query within the current directory.
     -- 'fzf' provides interactive fuzzy filtering of the results.
+	local current_dir = cx.active.current.cwd.path
     local search_command = string.format(
 		'cmd.exe /C es.exe "%s" -path "%s" | fzf --ansi --exact --no-sort --reverse',
         query,
         current_dir
     )
-	local current_dir = cx.active.current.cwd.path
-	ya.debug(current_dir)
 	-- while true do
 	-- 	local value, event = input:recv()
 	-- 	if event ~= 1 and event ~= 3 then
