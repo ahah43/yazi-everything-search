@@ -1,5 +1,5 @@
 local function entry(_, job)
-  local query = ya.input({
+  ya.input({
         title = "Search Current Directory (Everything)", -- Updated title
         prompt = "Enter search query:",                  -- Text displayed to the user
         -- You can add a `default = "initial_text"` here if you want a pre-filled value.
