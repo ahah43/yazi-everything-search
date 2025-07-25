@@ -39,28 +39,29 @@ local function entry()
     end
 
 	local h = hovered()
+	local parentDir = h.url.base
+
+	local search_command = string.format(
+		'pwsh.exe /C es.exe "%s" -path "%s" | fzf --ansi --exact --no-sort --reverse',
+        query,
+        parentDir
+    )
 	
-	local current_dir = ""
-	if h.is_dir then
-		current_dir  = string.format("%s", h.url.base)
-	else 
-		current_dir = "not a directory"
-	end
-
-
+	-- local current_dir = ""
+	-- if h.is_dir then
+	-- 	current_dir  = string.format("%s", h.url.base)
+	-- else 
+	-- 	current_dir = "not a directory"
+	-- end
 
 	ya.notify({
 			title = "Search Cancelled",
-            content = "root = " .. current_dir,
+            content = "search_command = " .. search_command,
             level = "info",
             timeout = 5,
         })
 
-    -- local search_command = string.format(
-	-- 	'cmd.exe /C es.exe "%s" -path "%s" | fzf --ansi --exact --no-sort --reverse',
-    --     query,
-    --     current_dir
-    -- )
+    
 	-- while true do
 	-- 	local value, event = input:recv()
 	-- 	if event ~= 1 and event ~= 3 then
