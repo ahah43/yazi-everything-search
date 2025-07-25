@@ -4,12 +4,12 @@ local function entry(_, job)
         prompt = "Enter search query:",                  -- Text displayed to the user
         -- You can add a `default = "initial_text"` here if you want a pre-filled value.
     })
-    ya.notify({
-        title = "Yazi Test Plugin",
-        content = "Hello from the simplest Yazi plugin!",
-        level = "info", -- "info", "success", "warn", "error"
-        timeout = 3,    -- Notification display duration in seconds
-    })
+    -- ya.notify({
+    --     title = "Yazi Test Plugin",
+    --     content = "Hello from the simplest Yazi plugin!",
+    --     level = "info", -- "info", "success", "warn", "error"
+    --     timeout = 3,    -- Notification display duration in seconds
+    -- })
 end
 return {
     entry = entry,
