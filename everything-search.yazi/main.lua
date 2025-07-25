@@ -31,34 +31,30 @@ local function entry()
     if not query or query:len() == 0 then
         ya.notify({
 			title = "Search Cancelled",
-            content = "DIR: ",
+            content = "What to search for?",
             level = "info",
             timeout = 5,
         })
         return -- Exit the plugin
     end
-	
-	-- Construct the command to execute.
-    -- We use 'cmd.exe /C' to ensure the pipe (`|`) works correctly on Windows.
-    -- 'es.exe' searches for the query within the current directory.
-    -- 'fzf' provides interactive fuzzy filtering of the results.
+
 	local h = hovered()
 	
 	local current_dir = ""
 	if h.is_dir then
-		current_dir  = string.format("%s", h.url)
+		current_dir  = string.format("%s", h.url.base)
 	else 
 		current_dir = "not a directory"
 	end
 
 
+
 	ya.notify({
 			title = "Search Cancelled",
-            content = "DIR: " .. current_dir,
+            content = "root = " .. current_dir,
             level = "info",
             timeout = 5,
         })
-
 
     -- local search_command = string.format(
 	-- 	'cmd.exe /C es.exe "%s" -path "%s" | fzf --ansi --exact --no-sort --reverse',
