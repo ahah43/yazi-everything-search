@@ -57,7 +57,7 @@ local function entry()
 
     ya.notify({
         title = "Search Cancelled",
-        content = "search_command = " .. search_command,
+        content = "search_command = " .. es_search_command,
         level = "info",
         timeout = 5
     })
