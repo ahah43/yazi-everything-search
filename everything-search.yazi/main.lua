@@ -25,19 +25,21 @@ end
 
 local function entry()
 	local input = prompt()
-
+	local current_dir = cx.active.current.cwd.path
+	
 	local query, event = input:recv()
-
     -- Check if the user cancelled or provided an empty query.
     if not query or query:len() == 0 then
         ya.notify({
             title = "Search Cancelled",
-            content = "No search query provided. Operation aborted.",
+            content = "DIR: " .. current_dir,
             level = "info",
             timeout = 5,
         })
         return -- Exit the plugin
     end
+	
+	
 
 	-- while true do
 	-- 	local value, event = input:recv()
