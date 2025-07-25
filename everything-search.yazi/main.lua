@@ -51,12 +51,12 @@ local function entry()
         parentDir
     )
 	
-	-- ya.notify({
-	-- 		title = "Search Cancelled",
-    --         content = "search_command = " .. search_command,
-    --         level = "info",
-    --         timeout = 5,
-    --     })
+	ya.notify({
+			title = "Search Cancelled",
+            content = "search_command = " .. search_command,
+            level = "info",
+            timeout = 5,
+        })
 
 
 end
