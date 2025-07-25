@@ -68,7 +68,7 @@ local function entry()
     local status, err =
         Command(es_search_command)
         -- :arg(es_command_string) -- Pass the entire piped command as a single argument
-        :stdout_capture() -- Capture the output from the command
+        -- :stdout_capture() -- Capture the output from the command
         :spawn() -- Start the command execution
         :wait() -- Wait for the command to complete and get results
 
