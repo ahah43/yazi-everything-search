@@ -74,6 +74,7 @@ local function entry()
 	-- 4. Execute the entire pipeline using the Command builder and the shell.
 	-- This is the most reliable way to handle pipes.
 	local output, err = Command("cmd"):arg({ "/c", full_command }):output()
+	
 
 	-- 5. Handle the result.
 	if err then
