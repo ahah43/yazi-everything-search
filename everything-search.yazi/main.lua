@@ -1,5 +1,7 @@
 --- @since 25.5.31
 
+local root = ya.sync(function() return cx.active.current.cwd end)
+
 local hovered = ya.sync(function()
 	local h = cx.active.current.hovered
 	if not h then
@@ -40,6 +42,7 @@ local function entry()
 
 	local h = hovered()
 	-- local parentDir = h.url.base
+
 	local parentDir = root()
 
 	local search_command = string.format(
