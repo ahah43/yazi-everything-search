@@ -34,4 +34,5 @@ If `es.exe` or `fzf.exe` are not in your system's PATH, you can specify their lo
 [plugin]
 [plugin.everything-search]
 es_path = "C:\\Program Files\\Everything\\es.exe"
-fzf_path = "C:\\path\\to\\your\\fzf.exe"```
+fzf_path = "C:\\path\\to\\your\\fzf.exe"
+```
