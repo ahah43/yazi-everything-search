@@ -1,0 +1,12 @@
+# .yazi/yazi.plugin.toml
+
+[plugin]
+# This 'name' is how users will refer to your plugin in their keybindings.
+# e.g., run = "plugin everything-search --preset"
+name = "everything-search"
+
+# Your author details.
+author = "Your GitHub Username"
+
+# A brief description of what the plugin does.
+description = "A yazi plugin to search files with Everything and select with fzf."
