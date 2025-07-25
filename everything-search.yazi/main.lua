@@ -66,7 +66,7 @@ local function entry()
     -- local es_command_string = string.format('es.exe "%s" -path "%s"', query, parentDir)
 
     -- local output, err = Command("es"):cwd(tostring(parentDir)):arg({query, "-path", parentDir}):output()
-    local output, err = Command("es"):arg({query, "-path", parentDir}):output()
+    local output, err = Command("es"):arg({query}):output(Command.PIPED):spawn()
 
 
 end
