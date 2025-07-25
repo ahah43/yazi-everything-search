@@ -1,80 +1,79 @@
 --- @since 25.5.31
-
-local root = ya.sync(function() return cx.active.current.cwd end)
+local root = ya.sync(function()
+    return cx.active.current.cwd
+end)
 
 local hovered = ya.sync(function()
-	local h = cx.active.current.hovered
-	if not h then
-		return {}
-	end
+    local h = cx.active.current.hovered
+    if not h then
+        return {}
+    end
 
-	return {
-		url = h.url,
-		is_dir = h.cha.is_dir,
-		unique = #cx.active.current.files == 1,
-	}
+    return {
+        url = h.url,
+        is_dir = h.cha.is_dir,
+        unique = #cx.active.current.files == 1
+    }
 end)
 
 local function prompt()
-	return ya.input {
-		title = "EveryThing Search:",
-		pos = { "center", w = 50 },
-		position = { "center", w = 50 }, -- TODO: remove
-		realtime = true,
-		debounce = 0.1,
-	}
+    return ya.input {
+        title = "EveryThing Search:",
+        pos = {
+            "center",
+            w = 50
+        },
+        position = {
+            "center",
+            w = 50
+        }, -- TODO: remove
+        realtime = true,
+        debounce = 0.1
+    }
 end
 
 local function entry()
-	local input = prompt()
-	
-	local query, event = input:recv()
+    local input = prompt()
+
+    local query, event = input:recv()
     -- Check if the user cancelled or provided an empty query.
     if not query or query:len() == 0 then
         ya.notify({
-			title = "Search Cancelled",
+            title = "Search Cancelled",
             content = "What to search for?",
             level = "info",
-            timeout = 5,
+            timeout = 5
         })
         return -- Exit the plugin
     end
 
-	local h = hovered()
-	-- local parentDir = h.url.base
+    local h = hovered()
+    -- local parentDir = h.url.base
 
-	local parentDir = root()
+    local parentDir = root()
 
-	local search_command = string.format(
-		'cmd.exe /C es.exe "%s" -path "%s" | fzf --ansi --exact --no-sort --reverse',
-        query,
-        parentDir
-    )
-	
-	ya.notify({
-			title = "Search Cancelled",
-            content = "search_command = " .. search_command,
-            level = "info",
-            timeout = 5,
-        })
+    local es_search_command = string.format('cmd.exe /C es.exe "%s" -path "%s"',
+        query, parentDir)
 
-	
-		
+    ya.notify({
+        title = "Search Cancelled",
+        content = "search_command = " .. search_command,
+        level = "info",
+        timeout = 5
+    })
 
-	local piped_command_string = string.format(
-        'es.exe "%s" -path "%s" | fzf --ansi --exact --no-sort --reverse',
-        query,
-        parentDir
-    )
+    --  | fzf --ansi --exact --no-sort --reverse
+    -- local es_command_string = string.format('es.exe "%s" -path "%s"', query, parentDir)
 
-    local status, err = Command("cmd.exe")
-        :arg("/C") -- /C tells cmd.exe to execute the string command and then terminate
-        :arg(piped_command_string) -- Pass the entire piped command as a single argument
-        :stdout_capture()          -- Capture the output from the command
-        :spawn()                   -- Start the command execution
-        :wait()                    -- Wait for the command to complete and get results
-
+    local status, err =
+        Command(es_search_command)
+        -- :arg(es_command_string) -- Pass the entire piped command as a single argument
+        :stdout_capture() -- Capture the output from the command
+        :spawn() -- Start the command execution
+        :wait() -- Wait for the command to complete and get results
 
 end
 
-return { entry = entry }
+return {
+    entry = entry
+}
