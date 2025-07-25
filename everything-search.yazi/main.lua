@@ -39,7 +39,8 @@ local function entry()
     end
 
 	local h = hovered()
-	local parentDir = h.url.base
+	-- local parentDir = h.url.base
+	local parentDir = root()
 
 	local search_command = string.format(
 		'cmd.exe /C es.exe "%s" -path "%s" | fzf --ansi --exact --no-sort --reverse',
@@ -54,19 +55,6 @@ local function entry()
     --         timeout = 5,
     --     })
 
-    
-	local ok, result = ya.exec(search_command, { capture = true, block = true, stream = true })
-    -- Handle the result of the command execution.
-    if not ok then
-        -- If the command itself failed to run (e.g., es.exe or fzf not found).
-        ya.notify({
-            title = "Search Error",
-            content = "Failed to run search command. Ensure 'Everything' (es.exe) and 'fzf' are installed and in your system's PATH. Error: " .. (result or "Unknown"),
-            level = "error",
-            timeout = 5,
-        })
-        return
-    end
 
 end
 
