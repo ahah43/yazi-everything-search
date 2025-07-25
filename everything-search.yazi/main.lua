@@ -1,105 +1,73 @@
---! This is the main.lua file for the 'everything-search-smart.yazi' plugin.
---! It combines interactive input with 'Everything' (es.exe) and 'fzf'
---! to search for files/folders in the current directory and navigate to the selection.
---!
---! NOTE: This plugin is specifically for Windows and requires:
---!   - 'Everything' (Voidtools) installed and 'es.exe' in PATH.
---!   - 'fzf' installed and in PATH.
+-- yazi-everything-search: main.lua
+-- This version adopts the structural and event-driven style of modern yazi plugins.
 
---- @sync entry
+-- Helper function to run the external search process.
+-- This encapsulates the core logic, keeping the entry point clean.
+local function run_search(cfg)
+	-- 1. Create the input prompt to get the user's query.
+	local query = ya.input {
+		title = "Search with Everything:",
+		pos = { "center", w = 50 }, -- Use modern positioning syntax
+	}
 
--- Function to display an input prompt to the user.
--- This is adapted from the 'smart filter' plugin's prompt mechanism.
-local function prompt()
-    return ya.input {
-        title = "Everything Search:", -- Title for the input prompt
-        prompt = "Enter search query:",
-        pos = { "center", w = 50 },
-        -- realtime = true, -- Removed: fzf handles realtime filtering, not Yazi's internal filter
-        -- debounce = 0.1,  -- Removed: Not needed since realtime is handled by fzf
-    }
+	-- If the user cancelled (e.g., pressed Esc), do nothing.
+	if not query or query == "" then
+		return
+	end
+
+	-- 2. Construct the full command to be run by the shell.
+	-- This lets the shell correctly handle the pipe '|' between the two commands.
+	local full_command = string.format('%s "%s" | %s', cfg.es_path, query, cfg.fzf_path)
+
+	-- 3. Run the external process. This will block and take over the UI
+	-- until fzf is closed by the user.
+	ya.process.run({
+		cmd = "cmd.exe",
+		args = { "/c", full_command },
+		on_done = function(success, stdout, stderr)
+			-- Handle potential errors from `es` or `fzf`.
+			if stderr and stderr ~= "" then
+				ya.notify({ title = "Search Error", content = stderr, level = "error" })
+				return
+			end
+
+			-- A non-success status usually means the user cancelled fzf.
+			if not success then
+				return
+			end
+
+			-- Clean the output from fzf (which includes a newline).
+			local selected = stdout:gsub("[\r\n]", "")
+
+			-- 4. Emit an 'open' event to let yazi handle opening the file or directory.
+			-- This is the idiomatic way to perform actions.
+			if selected ~= "" then
+				ya.emit("open", { selected })
+			end
+		end,
+	})
 end
 
--- The main entry point for the plugin.
-local function entry()
-    -- Get the input prompt object.
-    local input = prompt()
+-- This is the main setup function for the plugin, as recommended by yazi docs.
+local function setup(self)
+	-- Define the plugin's default configuration.
+	self.config = {
+		es_path = "es.exe",
+		fzf_path = "fzf.exe",
+	}
 
-    -- Wait for the user to provide input (or cancel).
-    -- input:recv() returns the value and the event type.
-    -- event == 1 typically means Enter was pressed (submit).
-    -- If the user presses Esc or closes the prompt, value will be nil or empty.
-    local query, event = input:recv()
-
-    -- Check if the user cancelled or provided an empty query.
-    if not query or query:len() == 0 then
-        ya.notify({
-            title = "Search Cancelled",
-            content = "No search query provided. Operation aborted.",
-            level = "info",
-            timeout = 2,
-        })
-        return -- Exit the plugin
-    end
-
-    -- Get the current working directory from Yazi's context.
-    -- This is crucial for 'es.exe' to limit its search to the current directory.
-    local current_dir = cx.active.current.cwd.path
-
-    -- Construct the command to execute.
-    -- We use 'cmd.exe /C' to ensure the pipe (`|`) works correctly on Windows.
-    -- 'es.exe' searches for the query within the current directory.
-    -- 'fzf' provides interactive fuzzy filtering of the results.
-    local search_command = string.format(
-        'cmd.exe /C es.exe "%s" -path "%s" | fzf --ansi --exact --no-sort --reverse',
-        query,
-        current_dir
-    )
-
-    -- Execute the command.
-    -- 'capture = true' to get the output from fzf (the selected line).
-    -- 'block = true' to keep Yazi's UI waiting while fzf is interactive.
-    -- 'stream = true' is generally good practice for external commands.
-    local ok, result = ya.exec(search_command, { capture = true, block = true, stream = true })
-
-    -- Handle the result of the command execution.
-    if not ok then
-        -- If the command itself failed to run (e.g., es.exe or fzf not found).
-        ya.notify({
-            title = "Search Error",
-            content = "Failed to run search command. Ensure 'Everything' (es.exe) and 'fzf' are installed and in your system's PATH. Error: " .. (result or "Unknown"),
-            level = "error",
-            timeout = 5,
-        })
-        return
-    end
-
-    -- Process the selected path from fzf's output.
-    -- fzf typically outputs the selected line followed by a newline.
-    local selected_path = result:match("^(.*)\n?$")
-
-    -- If a path was selected (fzf returned a non-empty string).
-    if selected_path and selected_path:len() > 0 then
-        -- Use ya.reveal() to navigate Yazi to the selected file or folder.
-        ya.reveal(selected_path)
-        ya.notify({
-            title = "Search Result",
-            content = "Navigated to: " .. selected_path,
-            level = "success",
-            timeout = 3,
-        })
-    else
-        -- If no item was selected in fzf (e.g., user pressed Esc in fzf, or no results).
-        ya.notify({
-            title = "Search Result",
-            content = "No item selected or no results found for your query.",
-            level = "info",
-            timeout = 2,
-        })
-    end
+	-- Define the keymap this plugin provides.
+	self.keymaps = {
+		{
+			name = "search",
+			desc = "Search files with Everything and fzf",
+			-- The 'run' function calls our main logic, passing its own config.
+			run = function() run_search(self.config) end,
+		},
+	}
 end
 
--- Return the plugin's exposed functions.
+-- The plugin's public interface, returned to yazi.
 return {
-    entry = entry,
+	setup = setup,
 }
