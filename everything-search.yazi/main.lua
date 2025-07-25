@@ -25,22 +25,30 @@ end
 
 local function entry()
 	local input = prompt()
-	local current_dir = cx.active.current.cwd.path
 	
 	local query, event = input:recv()
     -- Check if the user cancelled or provided an empty query.
     if not query or query:len() == 0 then
         ya.notify({
-            title = "Search Cancelled",
-            content = "DIR: " .. current_dir,
+			title = "Search Cancelled",
+            content = "DIR: ",
             level = "info",
             timeout = 5,
         })
         return -- Exit the plugin
     end
 	
-	
-
+	-- Construct the command to execute.
+    -- We use 'cmd.exe /C' to ensure the pipe (`|`) works correctly on Windows.
+    -- 'es.exe' searches for the query within the current directory.
+    -- 'fzf' provides interactive fuzzy filtering of the results.
+    local search_command = string.format(
+		'cmd.exe /C es.exe "%s" -path "%s" | fzf --ansi --exact --no-sort --reverse',
+        query,
+        current_dir
+    )
+	local current_dir = cx.active.current.cwd.path
+	ya.debug(current_dir)
 	-- while true do
 	-- 	local value, event = input:recv()
 	-- 	if event ~= 1 and event ~= 3 then
