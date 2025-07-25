@@ -65,7 +65,8 @@ local function entry()
     --  | fzf --ansi --exact --no-sort --reverse
     -- local es_command_string = string.format('es.exe "%s" -path "%s"', query, parentDir)
 
-    local output, err = Command("es"):cwd(tostring(parentDir)):arg({ "ahmed", query, "-path", parentDir}):output()
+    -- local output, err = Command("es"):cwd(tostring(parentDir)):arg({query, "-path", parentDir}):output()
+    local output, err = Command("es"):arg({query}):output()
 
 
 end
