@@ -1,29 +1,68 @@
--- yazi plugin to search with Everything within the current directory and select with fzf.
+--- @since 25.5.31
+local root = ya.sync(function()
+    return cx.active.current.cwd
+end)
 
--- A helper function to get the current working directory from yazi's UI.
--- This is the correct and modern way to do this.
-local function get_cwd()
-	return ya.sync(function() return cx.active.current.cwd end)
+local hovered = ya.sync(function()
+    local h = cx.active.current.hovered
+    if not h then
+        return {}
+    end
+
+    return {
+        url = h.url,
+        is_dir = h.cha.is_dir,
+        unique = #cx.active.current.files == 1
+    }
+end)
+
+local function prompt()
+    return ya.input {
+        title = "EveryThing Search:",
+        pos = {
+            "center",
+            w = 50
+        },
+        position = {
+            "center",
+            w = 50
+        }, -- TODO: remove
+        realtime = true,
+        debounce = 0.1
+    }
 end
 
--- The main entry function for the plugin.
 local function entry()
-	-- 1. Get the search query from the user.
-	-- We don't need `realtime` here, as we only act after the user presses Enter.
-	local query = ya.input {
-		title = "Search in current folder:",
-		pos = { "center", w = 50 },
-	}
+    local input = prompt()
 
-	-- Exit if the user cancelled.
-	if not query or query == "" then
-		return
-	end
+    local query, event = input:recv()
+    -- Check if the user cancelled or provided an empty query.
+    if not query or query:len() == 0 then
+        ya.notify({
+            title = "Search Cancelled",
+            content = "What to search for?",
+            level = "info",
+            timeout = 5
+        })
+        return -- Exit the plugin
+    end
 
-	-- 2. Get the current directory from yazi.
-	local current_dir = tostring(get_cwd())
+    local h = hovered()
+    -- local parentDir = h.url.base
 
-	-- 3. Construct the full command string for the shell.
+    local parentDir = root()
+
+    local es_search_command = string.format('es "%s" -path "%s"',
+        query, parentDir)
+
+    ya.notify({
+        title = "Search Cancelled",
+        content = "search_command = " .. es_search_command,
+        level = "info",
+        timeout = 5
+    })
+
+    -- 3. Construct the full command string for the shell.
 	-- This correctly builds the `es ... | fzf ...` pipeline.
 	-- Using -path with es.exe scopes the search.
 	local fzf_options = "--ansi --exact --no-sort --reverse"
@@ -34,7 +73,7 @@ local function entry()
 
 	-- 4. Execute the entire pipeline using the Command builder and the shell.
 	-- This is the most reliable way to handle pipes.
-	local output, err = Command("cmd"):args({ "/c", full_command }):output()
+	local output, err = Command("cmd"):arg({ "/c", full_command }):output()
 
 	-- 5. Handle the result.
 	if err then
@@ -45,12 +84,9 @@ local function entry()
 	-- Clean the result from fzf (which has a trailing newline).
 	local selected = output.stdout:gsub("[\r\n]", "")
 
-	-- If a file was selected, emit an "open" event to have yazi open it.
-	if selected ~= "" then
-		ya.emit("open", { selected })
-	end
+
 end
 
 return {
-	entry = entry,
+    entry = entry
 }
