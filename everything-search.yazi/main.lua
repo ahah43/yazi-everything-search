@@ -58,6 +58,8 @@ local function entry()
             timeout = 5,
         })
 
+	local ok, result = ya.command(search_command, { capture = true, block = true, stream = true })
+
 
 end
 
