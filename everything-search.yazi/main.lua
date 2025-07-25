@@ -33,9 +33,9 @@ local function prompt()
 end
 
 local function entry()
-    local input = prompt()
+    -- local input = prompt()
 
-    local query, event = input:recv()
+    local query, event = prompt()
     -- Check if the user cancelled or provided an empty query.
     if not query or query:len() == 0 then
         ya.notify({
