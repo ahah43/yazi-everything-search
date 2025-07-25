@@ -52,7 +52,7 @@ local function entry()
 
     local parentDir = root()
 
-    local es_search_command = string.format('cmd.exe /C es.exe "%s" -path "%s"',
+    local es_search_command = string.format('es "%s" -path "%s"',
         query, parentDir)
 
     ya.notify({
