@@ -58,7 +58,21 @@ local function entry()
             timeout = 5,
         })
 
-	local ok, result = ya.command(search_command, { capture = true, block = true, stream = true })
+	
+		
+
+	local piped_command_string = string.format(
+        'es.exe "%s" -path "%s" | fzf --ansi --exact --no-sort --reverse',
+        query,
+        parentDir
+    )
+
+    local status, err = Command("cmd.exe")
+        :arg("/C") -- /C tells cmd.exe to execute the string command and then terminate
+        :arg(piped_command_string) -- Pass the entire piped command as a single argument
+        :stdout_capture()          -- Capture the output from the command
+        :spawn()                   -- Start the command execution
+        :wait()                    -- Wait for the command to complete and get results
 
 
 end
