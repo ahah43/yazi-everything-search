@@ -42,46 +42,32 @@ local function entry()
 	local parentDir = h.url.base
 
 	local search_command = string.format(
-		'pwsh.exe /C es.exe "%s" -path "%s" | fzf --ansi --exact --no-sort --reverse',
+		'cmd.exe /C es.exe "%s" -path "%s" | fzf --ansi --exact --no-sort --reverse',
         query,
         parentDir
     )
 	
-	-- local current_dir = ""
-	-- if h.is_dir then
-	-- 	current_dir  = string.format("%s", h.url.base)
-	-- else 
-	-- 	current_dir = "not a directory"
-	-- end
-
-	ya.notify({
-			title = "Search Cancelled",
-            content = "search_command = " .. search_command,
-            level = "info",
-            timeout = 5,
-        })
+	-- ya.notify({
+	-- 		title = "Search Cancelled",
+    --         content = "search_command = " .. search_command,
+    --         level = "info",
+    --         timeout = 5,
+    --     })
 
     
-	-- while true do
-	-- 	local value, event = input:recv()
-	-- 	if event ~= 1 and event ~= 3 then
-	-- 		ya.emit("escape", { filter = true })
-	-- 		break
-	-- 	end
+	local ok, result = ya.exec(search_command, { capture = true, block = true, stream = true })
+    -- Handle the result of the command execution.
+    if not ok then
+        -- If the command itself failed to run (e.g., es.exe or fzf not found).
+        ya.notify({
+            title = "Search Error",
+            content = "Failed to run search command. Ensure 'Everything' (es.exe) and 'fzf' are installed and in your system's PATH. Error: " .. (result or "Unknown"),
+            level = "error",
+            timeout = 5,
+        })
+        return
+    end
 
-	-- 	ya.emit("filter_do", { value, smart = true })
-
-	-- 	
-	-- 	if h.unique and h.is_dir then
-	-- 		ya.emit("escape", { filter = true })
-	-- 		ya.emit("enter", {})
-	-- 		input = prompt()
-	-- 	elseif event == 1 then
-	-- 		ya.emit("escape", { filter = true })
-	-- 		ya.emit(h.is_dir and "enter" or "open", { h.url })
-	-- 		break
-	-- 	end
-	-- end
 end
 
 return { entry = entry }
