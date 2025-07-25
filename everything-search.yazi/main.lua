@@ -1,73 +1,51 @@
--- yazi-everything-search: main.lua
--- This version adopts the structural and event-driven style of modern yazi plugins.
+--- @since 25.5.31
 
--- Helper function to run the external search process.
--- This encapsulates the core logic, keeping the entry point clean.
-local function run_search(cfg)
-	-- 1. Create the input prompt to get the user's query.
-	local query = ya.input {
-		title = "Search with Everything:",
-		pos = { "center", w = 50 }, -- Use modern positioning syntax
-	}
-
-	-- If the user cancelled (e.g., pressed Esc), do nothing.
-	if not query or query == "" then
-		return
+local hovered = ya.sync(function()
+	local h = cx.active.current.hovered
+	if not h then
+		return {}
 	end
 
-	-- 2. Construct the full command to be run by the shell.
-	-- This lets the shell correctly handle the pipe '|' between the two commands.
-	local full_command = string.format('%s "%s" | %s', cfg.es_path, query, cfg.fzf_path)
-
-	-- 3. Run the external process. This will block and take over the UI
-	-- until fzf is closed by the user.
-	ya.process.run({
-		cmd = "cmd.exe",
-		args = { "/c", full_command },
-		on_done = function(success, stdout, stderr)
-			-- Handle potential errors from `es` or `fzf`.
-			if stderr and stderr ~= "" then
-				ya.notify({ title = "Search Error", content = stderr, level = "error" })
-				return
-			end
-
-			-- A non-success status usually means the user cancelled fzf.
-			if not success then
-				return
-			end
-
-			-- Clean the output from fzf (which includes a newline).
-			local selected = stdout:gsub("[\r\n]", "")
-
-			-- 4. Emit an 'open' event to let yazi handle opening the file or directory.
-			-- This is the idiomatic way to perform actions.
-			if selected ~= "" then
-				ya.emit("open", { selected })
-			end
-		end,
-	})
-end
-
--- This is the main setup function for the plugin, as recommended by yazi docs.
-local function setup(self)
-	-- Define the plugin's default configuration.
-	self.config = {
-		es_path = "es.exe",
-		fzf_path = "fzf.exe",
+	return {
+		url = h.url,
+		is_dir = h.cha.is_dir,
+		unique = #cx.active.current.files == 1,
 	}
+end)
 
-	-- Define the keymap this plugin provides.
-	self.keymaps = {
-		{
-			name = "search",
-			desc = "Search files with Everything and fzf",
-			-- The 'run' function calls our main logic, passing its own config.
-			run = function() run_search(self.config) end,
-		},
+local function prompt()
+	return ya.input {
+		title = "EveryThing Search:",
+		pos = { "center", w = 50 },
+		position = { "center", w = 50 }, -- TODO: remove
+		realtime = true,
+		debounce = 0.1,
 	}
 end
 
--- The plugin's public interface, returned to yazi.
-return {
-	setup = setup,
-}
+local function entry()
+	local input = prompt()
+
+	-- while true do
+	-- 	local value, event = input:recv()
+	-- 	if event ~= 1 and event ~= 3 then
+	-- 		ya.emit("escape", { filter = true })
+	-- 		break
+	-- 	end
+
+	-- 	ya.emit("filter_do", { value, smart = true })
+
+	-- 	local h = hovered()
+	-- 	if h.unique and h.is_dir then
+	-- 		ya.emit("escape", { filter = true })
+	-- 		ya.emit("enter", {})
+	-- 		input = prompt()
+	-- 	elseif event == 1 then
+	-- 		ya.emit("escape", { filter = true })
+	-- 		ya.emit(h.is_dir and "enter" or "open", { h.url })
+	-- 		break
+	-- 	end
+	-- end
+end
+
+return { entry = entry }
