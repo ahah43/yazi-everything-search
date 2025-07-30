@@ -1,215 +1,181 @@
-
 --- @since 25.5.31
-
 local root = ya.sync(function()
 
-return cx.active.current.cwd
+    return cx.active.current.cwd
 
 end)
-
-
 
 local hovered = ya.sync(function()
 
-local h = cx.active.current.hovered
+    local h = cx.active.current.hovered
 
-if not h then
+    if not h then
 
-return {}
+        return {}
 
-end
+    end
 
+    return {
 
+        url = h.url,
 
-return {
+        is_dir = h.cha.is_dir,
 
-url = h.url,
+        unique = #cx.active.current.files == 1
 
-is_dir = h.cha.is_dir,
-
-unique = #cx.active.current.files == 1
-
-}
+    }
 
 end)
 
-
-
 local function prompt()
 
-return ya.input {
+    return ya.input {
 
-title = "EveryThing Search:",
+        title = "EveryThing Search:",
 
-pos = {
+        pos = {
 
-"center",
+            "center",
 
-w = 50
+            w = 50
 
-},
+        },
 
-position = {
+        position = {
 
-"center",
+            "center",
 
-w = 50
+            w = 50
 
-}, -- TODO: remove
+        } -- TODO: remove
 
--- realtime = false,
+        -- realtime = false,
 
--- debounce = 0.1
+        -- debounce = 0.1
 
-}
+    }
 
 end
 
 local function everything_search(path, subject)
 
--- Build the command
+    -- Build the command
 
-local cmd = string.format('es.exe -path "%s" "%s"', path, subject)
+    local cmd = string.format('es.exe -path "%s" "%s"', path, subject)
 
-local results = {}
+    local results = {}
 
--- Open a process to read the output
+    -- Open a process to read the output
 
-local handle = io.popen(cmd, "r")
+    local handle = io.popen(cmd, "r")
 
-if handle then
+    if handle then
 
-for line in handle:lines() do
+        for line in handle:lines() do
 
-table.insert(results, line)
+            table.insert(results, line)
+
+        end
+
+        handle:close()
+
+    end
+
+    return results
 
 end
-
-handle:close()
-
-end
-
-return results
-
-end
-
-
 
 local function entry()
 
--- local input = prompt()
+    -- local input = prompt()
 
+    local query, event = prompt()
 
+    -- Check if the user cancelled or provided an empty query.
 
-local query, event = prompt()
+    if not query or query:len() == 0 then
 
--- Check if the user cancelled or provided an empty query.
+        ya.notify({
 
-if not query or query:len() == 0 then
+            title = "Search Cancelled v123",
 
-ya.notify({
+            content = "What to search for?",
 
-title = "Search Cancelled v123",
+            level = "info",
 
-content = "What to search for?",
+            timeout = 5
 
-level = "info",
+        })
 
-timeout = 5
+        return -- Exit the plugin
 
-})
+    end
 
-return -- Exit the plugin
+    local h = hovered()
 
-end
+    -- local parentDir = h.url.base
 
+    local parentDir = root()
 
+    local es_search_command = string.format('es "%s" -path "%s"', query, parentDir)
 
-local h = hovered()
+    ya.notify({
 
--- local parentDir = h.url.base
+        title = "Search Started v123",
 
+        content = "search_command = " .. es_search_command,
 
+        level = "info",
 
-local parentDir = root()
+        timeout = 5
 
+    })
 
+    -- 3. Construct the full command string for the shell.
 
-local es_search_command = string.format('es "%s" -path "%s"',
+    -- This correctly builds the `es ... | fzf ...` pipeline.
 
-query, parentDir)
+    -- Using -path with es.exe scopes the search.
 
+    local fzf_options = "--ansi --no-sort --reverse"
 
+    local full_command = string.format('es.exe -path "%s" "%s" | fzf.exe %s', parentDir, query, fzf_options)
 
-ya.notify({
+    -- local full_command = string.format('es.exe -path "%s" "%s"', parentDir, query)
 
-title = "Search Started v123",
+    -- Optional: A notification to debug the exact command being run.
 
-content = "search_command = " .. es_search_command,
+    -- ya.notify({ title = "Debug", content = full_command, level = "info" })
 
-level = "info",
+    -- 4. Execute the entire pipeline using the Command builder and the shell.
 
-timeout = 5
+    -- This is the most reliable way to handle pipes.
 
-})
+    local output, err = Command("cmd"):arg({"/c", full_command}):stdin(Command.INHERIT):stdout(Command.PIPED):stderr(
+        Command.PIPED):spawn()
 
+    -- 5. Handle the result.
 
+    if err then
 
--- 3. Construct the full command string for the shell.
+        ya.notify({
+            title = "Plugin Error",
+            content = tostring(err),
+            level = "error"
+        })
 
--- This correctly builds the `es ... | fzf ...` pipeline.
+        return
 
--- Using -path with es.exe scopes the search.
+    end
 
-local fzf_options = "--ansi --no-sort --reverse"
+    -- Clean the result from fzf (which has a trailing newline).
 
-local full_command = string.format('es.exe -path "%s" "%s" | fzf.exe %s', parentDir, query, fzf_options)
-
--- local full_command = string.format('es.exe -path "%s" "%s"', parentDir, query)
-
-
-
--- Optional: A notification to debug the exact command being run.
-
--- ya.notify({ title = "Debug", content = full_command, level = "info" })
-
-
-
--- 4. Execute the entire pipeline using the Command builder and the shell.
-
--- This is the most reliable way to handle pipes.
-
-local output, err = Command("cmd"):arg({ "/c", full_command }):output():spawn()
-
-
-
-
--- 5. Handle the result.
-
-if err then
-
-ya.notify({ title = "Plugin Error", content = tostring(err), level = "error" })
-
-return
+    local selected = output.stdout:gsub("[\r\n]", "")
 
 end
-
-
-
--- Clean the result from fzf (which has a trailing newline).
-
-local selected = output.stdout:gsub("[\r\n]", "")
-
-
-
-
-
-end
-
-
 
 return {
 
-entry = entry
+    entry = entry
 
 }
