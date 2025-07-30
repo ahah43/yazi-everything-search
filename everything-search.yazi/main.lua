@@ -40,8 +40,8 @@ local function prompt()
 end
 
 local function entry(_)
-    local _permit = ya.hide()
-    local cmd_args = "es folder: | fzf"
+    -- local _permit = ya.hide()
+    -- local cmd_args = "es folder: | fzf"
 
     local query, event = prompt()
 
@@ -59,7 +59,7 @@ local function entry(_)
     -- local h = hovered()
     -- local parentDir = h.url.base
     local parentDir = root()
-    local es_search_command = string.format('es "%s" -path "%s"', query, parentDir)
+    local es_search_command = string.format('es "%s" -path "%s" | fzf', query, parentDir)
 
     local child, err = Command("cmd"):arg({"/c", es_search_command}):stdin(Command.INHERIT):stdout(Command.PIPED)
         :stderr(Command.PIPED):spawn()
