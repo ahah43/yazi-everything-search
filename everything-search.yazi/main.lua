@@ -151,7 +151,7 @@ local function entry()
 
     -- This is the most reliable way to handle pipes.
 
-    local output, err = Command("cmd"):arg({"/c", full_command}):stdin(Command.INHERIT):stdout(Command.PIPED):stderr(
+    local output, err = Command("cmd"):arg({"/c", full_command}):stdout(Command.PIPED):stderr(
         Command.PIPED):spawn()
 
     -- 5. Handle the result.
