@@ -41,9 +41,9 @@ end
 
 local function entry(_)
     -- local _permit = ya.hide()
-    local cmd_args = "es "pdf" | fzf"
+    local cmd_args = "es | fzf"
 
-    local query, event = prompt()
+    -- local query, event = prompt()
 
     -- -- Check if the user cancelled or provided an empty query.
     -- if not query or query:len() == 0 then
@@ -65,7 +65,7 @@ local function entry(_)
 
     -- local h = hovered()
     -- local parentDir = h.url.base
-    local parentDir = root()
+    -- local parentDir = root()
     local es_search_command = string.format('es "%s" -path "%s" | fzf', query, parentDir)
 
     local child, err = Command("cmd"):arg({"/c", cmd_args}):stdin(Command.INHERIT):stdout(Command.PIPED):stderr(
