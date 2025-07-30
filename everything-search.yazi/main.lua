@@ -151,26 +151,29 @@ local function entry()
 
     -- This is the most reliable way to handle pipes.
 
-    local output, err = Command("cmd"):arg({"/c", full_command}):stdout(Command.PIPED):stderr(
+    local child, err = Command("cmd"):arg({"/c", full_command}):stdout(Command.PIPED):stderr(
         Command.PIPED):spawn()
 
     -- 5. Handle the result.
 
-    if err then
+    if not child then
+		return fail("Spawn command failed with error code %s.", err)
+	end
 
-        ya.notify({
-            title = "Plugin Error",
-            content = tostring(err),
-            level = "error"
-        })
+    local output, err = child:wait_with_output()
+	if not output then
+		return fail("Cannot read command output, error code %s", err)
+	elseif not output.status.success and output.status.code ~= 130 then
+		return fail("Spawn command exited with error code %s", output.status.code)
+	end
+    
+    local target = output.stdout:gsub("\n$", "")
 
-        return
+	if target ~= "" then
+		local is_dir = target:sub(-1) == "/"
+		ya.manager_emit(is_dir and "cd" or "reveal", { target })
+	end
 
-    end
-
-    -- Clean the result from fzf (which has a trailing newline).
-
-    local selected = output.stdout:gsub("[\r\n]", "")
 
 end
 
