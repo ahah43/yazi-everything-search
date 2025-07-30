@@ -60,8 +60,8 @@ local function entry(_)
    
 
     local h = hovered()
-    local parentDir = h.url.base
-    -- local parentDir = root()
+    -- local parentDir = h.url.base
+    local parentDir = root()
     local es_search_command = string.format('es "%s" -path "%s" | fzf', query, parentDir)
 
     --  ya.notify({
