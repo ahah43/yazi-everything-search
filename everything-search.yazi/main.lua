@@ -73,7 +73,7 @@ local function entry(_)
     -- })
     local _permit = ya.hide() -- important
 
-    local child, err = Command("cmd"):arg({"/c", es_search_command}):stdin(Command.INHERIT):stdout(Command.PIPED):stderr(
+    local child, err = Command("pwsh"):arg({"/c", es_search_command}):stdin(Command.INHERIT):stdout(Command.PIPED):stderr(
         Command.PIPED):spawn()
 
     if not child then
