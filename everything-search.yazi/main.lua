@@ -36,11 +36,12 @@ local function entry()
     -- Prompt the user for a search query.
     local query, event = prompt()
 
-    -- Check if the user cancelled the input (event is 'cancel') or provided an empty query.
-    if not query or query:len() == 0 or event == 'cancel' then
+    -- Check if the user cancelled or provided an empty query.
+    -- Reverted to your original cancellation check, as you indicated it worked better.
+    if not query or query:len() == 0 then
         ya.notify({
             title = "Search Cancelled",
-            content = "No search query provided.",
+            content = "No search query provided or input cancelled.",
             level = "info",
             timeout = 3 -- Display for 3 seconds
         })
@@ -60,7 +61,7 @@ local function entry()
     -- This correctly builds the `es.exe ... | fzf.exe ...` pipeline.
     -- Using -path with es.exe scopes the search to the parentDir.
     local full_command = string.format('es.exe -path "%s" "%s" | fzf.exe %s', parentDir, query, fzf_options)
-    ya.dbg(full_command)
+
     -- Notify the user that the search has started.
     ya.notify({
         title = "Everything Search",
@@ -82,9 +83,9 @@ local function entry()
         ya.log("Everything Search Plugin: Command execution error: " .. tostring(err))
         ya.notify({
             title = "Plugin Error",
-            content = "Failed to execute search command. Check Yazi logs for details. Error: " .. tostring(err),
+            content = "Failed to execute search command. Please ensure 'es.exe' and 'fzf.exe' are in your system's PATH. Check Yazi logs for details. Error: " .. tostring(err),
             level = "error",
-            timeout = 5
+            timeout = 8 -- Increased timeout for critical error message
         })
         return
     end
@@ -93,6 +94,17 @@ local function entry()
     ya.log("Everything Search Plugin: Command stdout: " .. (output.stdout or "nil"))
     ya.log("Everything Search Plugin: Command stderr: " .. (output.stderr or "nil"))
 
+    -- Check if stderr has content, which often indicates an error from es.exe or fzf.exe
+    if output.stderr and output.stderr:len() > 0 then
+        ya.log("Everything Search Plugin: Detected stderr output: " .. output.stderr)
+        ya.notify({
+            title = "Search Command Warning/Error",
+            content = "Command produced error output. Check Yazi logs. Stderr: " .. output.stderr:sub(1, 100) .. (output.stderr:len() > 100 and "..." or ""), -- Truncate for notification
+            level = "warn",
+            timeout = 8
+        })
+    end
+
     -- Clean the result from fzf (which typically has a trailing newline).
     local selected = output.stdout:gsub("[\r\n]", "")
 
@@ -100,7 +112,7 @@ local function entry()
     if selected:len() == 0 then
         ya.notify({
             title = "Everything Search",
-            content = "No item selected from search results.",
+            content = "No item selected from search results or no results found.",
             level = "info",
             timeout = 3
         })
