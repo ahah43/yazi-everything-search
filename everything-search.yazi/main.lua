@@ -63,7 +63,7 @@ local function entry(_)
     --     timeout = 5
     -- })
 
-    -- local h = hovered()
+    local h = hovered()
     local parentDir = h.url.base
     -- local parentDir = root()
     local es_search_command = string.format('es "%s" -path "%s" | fzf', query, parentDir)
