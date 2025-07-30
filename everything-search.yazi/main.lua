@@ -1,188 +1,35 @@
---- @since 25.5.31
-local root = ya.sync(function()
-
-    return cx.active.current.cwd
-
-end)
-
-local hovered = ya.sync(function()
-
-    local h = cx.active.current.hovered
-
-    if not h then
-
-        return {}
-
-    end
-
-    return {
-
-        url = h.url,
-
-        is_dir = h.cha.is_dir,
-
-        unique = #cx.active.current.files == 1
-
-    }
-
-end)
-
 local function fail(s, ...)
 	ya.notify { title = "my_plugin_name", content = string.format(s, ...), timeout = 5, level = "error" }
 end
 
-local function prompt()
-
-    return ya.input {
-
-        title = "EveryThing Search:",
-
-        pos = {
-
-            "center",
-
-            w = 50
-
-        },
-
-        position = {
-
-            "center",
-
-            w = 50
-
-        } -- TODO: remove
-
-        -- realtime = false,
-
-        -- debounce = 0.1
-
-    }
-
-end
-
-local function everything_search(path, subject)
-
-    -- Build the command
-
-    local cmd = string.format('es.exe -path "%s" "%s"', path, subject)
-
-    local results = {}
-
-    -- Open a process to read the output
-
-    local handle = io.popen(cmd, "r")
-
-    if handle then
-
-        for line in handle:lines() do
-
-            table.insert(results, line)
-
-        end
-
-        handle:close()
-
-    end
-
-    return results
-
-end
-
-local function entry()
-
-    -- local input = prompt()
-
-    local query, event = prompt()
-
-    -- Check if the user cancelled or provided an empty query.
-
-    if not query or query:len() == 0 then
-
-        ya.notify({
-
-            title = "Search Cancelled v123",
-
-            content = "What to search for?",
-
-            level = "info",
-
-            timeout = 5
-
-        })
-
-        return -- Exit the plugin
-
-    end
-
-    local h = hovered()
-
-    -- local parentDir = h.url.base
-
-    local parentDir = root()
-
-    local es_search_command = string.format('es "%s" -path "%s"', query, parentDir)
-
-    ya.notify({
-
-        title = "Search Started v123",
-
-        content = "search_command = " .. es_search_command,
-
-        level = "info",
-
-        timeout = 5
-
-    })
-
-    -- 3. Construct the full command string for the shell.
-
-    -- This correctly builds the `es ... | fzf ...` pipeline.
-
-    -- Using -path with es.exe scopes the search.
-
-    local fzf_options = "--ansi --no-sort --reverse"
-
-    local full_command = string.format('es.exe -path "%s" "%s" | fzf.exe %s', parentDir, query, fzf_options)
-
-    -- local full_command = string.format('es.exe -path "%s" "%s"', parentDir, query)
-
-    -- Optional: A notification to debug the exact command being run.
-
-    -- ya.notify({ title = "Debug", content = full_command, level = "info" })
-
-    -- 4. Execute the entire pipeline using the Command builder and the shell.
-
-    -- This is the most reliable way to handle pipes.
-
-    local child, err = Command("cmd"):arg({"/c", full_command}):stdout(Command.PIPED):stderr(
-        Command.PIPED):spawn()
-
-    -- 5. Handle the result.
-
-    if not child then
+local function entry(_)
+	local _permit = ya.hide()
+	local cmd_args = "fd -d 1 | fzf"
+
+	local child, err = Command("sh")
+		:args({ "-c", cmd_args })
+		:stdin(Command.INHERIT)
+		:stdout(Command.PIPED)
+		:stderr(Command.PIPED)
+		:spawn()
+
+	if not child then
 		return fail("Spawn command failed with error code %s.", err)
 	end
 
-    local output, err = child:wait_with_output()
+	local output, err = child:wait_with_output()
 	if not output then
 		return fail("Cannot read command output, error code %s", err)
 	elseif not output.status.success and output.status.code ~= 130 then
 		return fail("Spawn command exited with error code %s", output.status.code)
 	end
-    
-    -- local target = output.stdout:gsub("\n$", "")
 
-	-- if target ~= "" then
-	-- 	local is_dir = target:sub(-1) == "/"
-	-- 	ya.manager_emit(is_dir and "cd" or "reveal", { target })
-	-- end
+	local target = output.stdout:gsub("\n$", "")
 
-
+	if target ~= "" then
+		local is_dir = target:sub(-1) == "/"
+		ya.manager_emit(is_dir and "cd" or "reveal", { target })
+	end
 end
 
-return {
-
-    entry = entry
-
-}
+return { entry = entry }
