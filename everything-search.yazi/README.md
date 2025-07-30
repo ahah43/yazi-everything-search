@@ -25,13 +25,13 @@ then:
     use = "YourGitHubUsername/yazi-everything-search"
     ```
 
-2.  Add a keybinding to your `yazi.toml`:
+2.  Add a keybinding to your `keymap.toml`:
 
     ```toml
-    [manager.prepend_keymaps]
-    normal = [
-        { on = [ "f" ], run = "plugin everything-search --preset" },
-    ]
+    [[mgr.prepend_keymap]]
+    on   = [ "g", "e"]
+    run = "plugin everything-search"
+    desc = "run everything search (es.exe)"
     ```
 
 ## Configuration

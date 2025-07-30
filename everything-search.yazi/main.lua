@@ -80,8 +80,8 @@ local function entry()
 	-- This correctly builds the `es ... | fzf ...` pipeline.
 	-- Using -path with es.exe scopes the search.
 	local fzf_options = "--ansi --no-sort --reverse"
-	local full_command = string.format('es.exe -path "%s" "%s" | fzf.exe %s', parentDir, query, fzf_options)
-	-- local full_command = string.format('es.exe -path "%s" "%s"', parentDir, query)
+	-- local full_command = string.format('es.exe -path "%s" "%s" | fzf.exe %s', parentDir, query, fzf_options)
+	local full_command = string.format('es.exe -path "%s" "%s"', parentDir, query)
 
 	-- Optional: A notification to debug the exact command being run.
 	-- ya.notify({ title = "Debug", content = full_command, level = "info" })
