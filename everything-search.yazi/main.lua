@@ -27,6 +27,10 @@ local hovered = ya.sync(function()
 
 end)
 
+local function fail(s, ...)
+	ya.notify { title = "my_plugin_name", content = string.format(s, ...), timeout = 5, level = "error" }
+end
+
 local function prompt()
 
     return ya.input {
