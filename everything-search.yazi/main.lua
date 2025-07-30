@@ -69,20 +69,29 @@ local function entry()
         timeout = 3
     })
 
+    -- DEBUG: Log the full command being executed. This will appear in Yazi's log file.
+    ya.log("Everything Search Plugin: Full command: " .. full_command)
+
     -- Execute the entire pipeline using Yazi's Command builder.
     -- This is the most reliable way to handle external commands and pipes.
     local output, err = Command("cmd"):arg({ "/c", full_command }):output():spawn()
 
     -- Handle any errors during command execution.
     if err then
+        -- DEBUG: Log the error details.
+        ya.log("Everything Search Plugin: Command execution error: " .. tostring(err))
         ya.notify({
             title = "Plugin Error",
-            content = "Failed to execute search command: " .. tostring(err),
+            content = "Failed to execute search command. Check Yazi logs for details. Error: " .. tostring(err),
             level = "error",
             timeout = 5
         })
         return
     end
+
+    -- DEBUG: Log the stdout and stderr from the command.
+    ya.log("Everything Search Plugin: Command stdout: " .. (output.stdout or "nil"))
+    ya.log("Everything Search Plugin: Command stderr: " .. (output.stderr or "nil"))
 
     -- Clean the result from fzf (which typically has a trailing newline).
     local selected = output.stdout:gsub("[\r\n]", "")
