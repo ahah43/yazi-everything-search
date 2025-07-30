@@ -40,7 +40,7 @@ local function prompt()
 end
 
 local function entry(_)
-    local _permit = ya.hide() -- important
+    
     -- local cmd_args = "fd -d 1 | fzf"
     -- local cmd_args = "es | fzf"
 
@@ -70,6 +70,7 @@ local function entry(_)
     --     level = "info",
     --     timeout = 5
     -- })
+    local _permit = ya.hide() -- important
 
     local child, err = Command("pwsh"):arg({"/c", es_search_command}):stdin(Command.INHERIT):stdout(Command.PIPED):stderr(
         Command.PIPED):spawn()
