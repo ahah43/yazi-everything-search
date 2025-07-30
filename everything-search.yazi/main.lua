@@ -4,7 +4,7 @@ end
 
 local function entry(_)
 	local _permit = ya.hide()
-	local cmd_args = "es | fzf"
+	local cmd_args = "es folder: | fzf"
 
 	local child, err = Command("cmd")
 		:arg({ "/c", cmd_args })
