@@ -53,7 +53,7 @@ local function entry()
     -- Check if the user cancelled or provided an empty query.
     if not query or query:len() == 0 then
         ya.notify({
-            title = "Search Cancelled",
+            title = "Search Cancelled v123",
             content = "What to search for?",
             level = "info",
             timeout = 5
@@ -70,7 +70,7 @@ local function entry()
         query, parentDir)
 
     ya.notify({
-        title = "Search Started",
+        title = "Search Started v123",
         content = "search_command = " .. es_search_command,
         level = "info",
         timeout = 5
@@ -80,8 +80,8 @@ local function entry()
 	-- This correctly builds the `es ... | fzf ...` pipeline.
 	-- Using -path with es.exe scopes the search.
 	local fzf_options = "--ansi --no-sort --reverse"
-	-- local full_command = string.format('es.exe -path "%s" "%s" | fzf.exe %s', parentDir, query, fzf_options)
-	local full_command = string.format('es.exe -path "%s" "%s"', parentDir, query)
+	local full_command = string.format('es.exe -path "%s" "%s" | fzf.exe %s', parentDir, query, fzf_options)
+	-- local full_command = string.format('es.exe -path "%s" "%s"', parentDir, query)
 
 	-- Optional: A notification to debug the exact command being run.
 	-- ya.notify({ title = "Debug", content = full_command, level = "info" })
