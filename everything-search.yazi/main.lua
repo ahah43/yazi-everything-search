@@ -56,13 +56,20 @@ local function entry(_)
         return -- Exit the plugin
     end
 
+    ya.notify({
+        title = "Search Started v123",
+        content = "search_command = " .. es_search_command,
+        level = "info",
+        timeout = 5
+    })
+
     -- local h = hovered()
     -- local parentDir = h.url.base
     local parentDir = root()
     local es_search_command = string.format('es "%s" -path "%s" | fzf', query, parentDir)
 
-    local child, err = Command("cmd"):arg({"/c", cmd_args}):stdin(Command.INHERIT):stdout(Command.PIPED)
-        :stderr(Command.PIPED):spawn()
+    local child, err = Command("cmd"):arg({"/c", cmd_args}):stdin(Command.INHERIT):stdout(Command.PIPED):stderr(
+        Command.PIPED):spawn()
 
     if not child then
         return fail("Spawn command failed with error code %s.", err)
