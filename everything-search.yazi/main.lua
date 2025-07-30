@@ -167,12 +167,12 @@ local function entry()
 		return fail("Spawn command exited with error code %s", output.status.code)
 	end
     
-    local target = output.stdout:gsub("\n$", "")
+    -- local target = output.stdout:gsub("\n$", "")
 
-	if target ~= "" then
-		local is_dir = target:sub(-1) == "/"
-		ya.manager_emit(is_dir and "cd" or "reveal", { target })
-	end
+	-- if target ~= "" then
+	-- 	local is_dir = target:sub(-1) == "/"
+	-- 	ya.manager_emit(is_dir and "cd" or "reveal", { target })
+	-- end
 
 
 end
