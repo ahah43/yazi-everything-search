@@ -41,27 +41,27 @@ end
 
 local function entry(_)
     -- local _permit = ya.hide()
-    local cmd_args = "es folder: | fzf"
+    local cmd_args = "es "pdf" | fzf"
 
     local query, event = prompt()
 
-    -- Check if the user cancelled or provided an empty query.
-    if not query or query:len() == 0 then
-        ya.notify({
-            title = "Search Cancelled v123",
-            content = "What to search for?",
-            level = "info",
-            timeout = 5
-        })
-        return -- Exit the plugin
-    end
+    -- -- Check if the user cancelled or provided an empty query.
+    -- if not query or query:len() == 0 then
+    --     ya.notify({
+    --         title = "Search Cancelled v123",
+    --         content = "What to search for?",
+    --         level = "info",
+    --         timeout = 5
+    --     })
+    --     return -- Exit the plugin
+    -- end
 
-    ya.notify({
-        title = "Search Started v123",
-        content = "search_command = " .. es_search_command,
-        level = "info",
-        timeout = 5
-    })
+    -- ya.notify({
+    --     title = "Search Started v123",
+    --     content = "search_command = " .. es_search_command,
+    --     level = "info",
+    --     timeout = 5
+    -- })
 
     -- local h = hovered()
     -- local parentDir = h.url.base
