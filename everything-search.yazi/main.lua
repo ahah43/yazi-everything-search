@@ -60,7 +60,7 @@ local function entry()
     -- This correctly builds the `es.exe ... | fzf.exe ...` pipeline.
     -- Using -path with es.exe scopes the search to the parentDir.
     local full_command = string.format('es.exe -path "%s" "%s" | fzf.exe %s', parentDir, query, fzf_options)
-
+    ya.dbg(full_command)
     -- Notify the user that the search has started.
     ya.notify({
         title = "Everything Search",
