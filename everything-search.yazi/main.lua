@@ -41,7 +41,8 @@ end
 
 local function entry(_)
     -- local _permit = ya.hide()
-    local cmd_args = "es | fzf"
+    local cmd_args = "fd -d 1 | fzf"
+    -- local cmd_args = "es | fzf"
 
     local query, event = prompt()
 
@@ -70,14 +71,14 @@ local function entry(_)
         timeout = 5
     })
 
-    local child, err = Command("pwsh"):arg({"/c", es_search_command}):stdin(Command.INHERIT):stdout(Command.PIPED):stderr(
+    local child, err = Command("pwsh"):arg({"/c", cmd_args}):stdin(Command.INHERIT):stdout(Command.PIPED):stderr(
         Command.PIPED):spawn()
 
     if not child then
         return fail("Spawn command failed with error code %s.", err)
     end
 
-    local output, err = child:sync()
+    local output, err = child:wait_with_output()
     if not output then
         return fail("Cannot read command output, error code %s", err)
     -- elseif not output.status.success and output.status.code ~= 130 then
