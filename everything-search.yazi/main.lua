@@ -40,7 +40,7 @@ end
 -- end
 
 local function entry(_)
-    -- local _permit = ya.hide()
+    local _permit = ya.hide()
     local cmd_args = "fd -d 1 | fzf"
     -- local cmd_args = "es | fzf"
 
