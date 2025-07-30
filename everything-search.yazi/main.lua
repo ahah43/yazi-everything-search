@@ -43,7 +43,7 @@ local function entry(_)
     -- local _permit = ya.hide()
     local cmd_args = "es | fzf"
 
-    -- local query, event = prompt()
+    local query, event = prompt()
 
     -- -- Check if the user cancelled or provided an empty query.
     -- if not query or query:len() == 0 then
