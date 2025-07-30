@@ -1,0 +1,1 @@
+cmd.exe /C es.exe "ahmed" -path "C:\" | fzf --ansi --exact --no-sort --reverse

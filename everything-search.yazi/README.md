@@ -10,6 +10,14 @@ A plugin for the [yazi](https://github.com/sxyazi/yazi) file manager that allows
 
 ## Installation
 
+## Installation
+
+```sh
+ya pkg add ahah43/yazi-plugins:everything-search
+```
+
+then:
+
 1.  Add this to your `packages.toml` file (usually at `%AppData%\yazi\config\packages.toml`):
 
     ```toml

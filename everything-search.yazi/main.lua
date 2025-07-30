@@ -31,6 +31,20 @@ local function prompt()
         -- debounce = 0.1
     }
 end
+local function everything_search(path, subject)
+    -- Build the command
+    local cmd = string.format('es.exe -path "%s" "%s"', path, subject)
+    local results = {}
+    -- Open a process to read the output
+    local handle = io.popen(cmd, "r")
+    if handle then
+        for line in handle:lines() do
+            table.insert(results, line)
+        end
+        handle:close()
+    end
+    return results
+end
 
 local function entry()
     -- local input = prompt()
@@ -56,7 +70,7 @@ local function entry()
         query, parentDir)
 
     ya.notify({
-        title = "Search Cancelled",
+        title = "Search Started",
         content = "search_command = " .. es_search_command,
         level = "info",
         timeout = 5
