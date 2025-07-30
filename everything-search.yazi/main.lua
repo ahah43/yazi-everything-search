@@ -64,11 +64,11 @@ local function entry(_)
     -- })
 
     -- local h = hovered()
-    -- local parentDir = h.url.base
+    local parentDir = h.url.base
     -- local parentDir = root()
     local es_search_command = string.format('es "%s" -path "%s" | fzf', query, parentDir)
 
-    local child, err = Command("cmd"):arg({"/c", cmd_args}):stdin(Command.INHERIT):stdout(Command.PIPED):stderr(
+    local child, err = Command("cmd"):arg({"/c", es_search_command}):stdin(Command.INHERIT):stdout(Command.PIPED):stderr(
         Command.PIPED):spawn()
 
     if not child then
