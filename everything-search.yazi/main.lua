@@ -1,3 +1,4 @@
+
 local function fail(s, ...)
     ya.notify {
         title = "my_plugin_name",
