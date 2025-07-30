@@ -8,36 +8,36 @@ local function fail(s, ...)
 end
 --- @since 25.5.31
 
-local root = ya.sync(function()
-    return cx.active.current.cwd
-end)
+-- local root = ya.sync(function()
+--     return cx.active.current.cwd
+-- end)
 
-local hovered = ya.sync(function()
-    local h = cx.active.current.hovered
-    if not h then
-        return {}
-    end
-    return {
-        url = h.url,
-        is_dir = h.cha.is_dir,
-        unique = #cx.active.current.files == 1
-    }
-end)
+-- local hovered = ya.sync(function()
+--     local h = cx.active.current.hovered
+--     if not h then
+--         return {}
+--     end
+--     return {
+--         url = h.url,
+--         is_dir = h.cha.is_dir,
+--         unique = #cx.active.current.files == 1
+--     }
+-- end)
 
-local function prompt()
-    return ya.input {
-        title = "EveryThing Search:",
-        pos = {
-            "center",
-            w = 50
-        },
-        position = {
-            "center",
-            w = 50
-        } -- TODO: remove
-        -- realtime = false,debounce = 0.1
-    }
-end
+-- local function prompt()
+--     return ya.input {
+--         title = "EveryThing Search:",
+--         pos = {
+--             "center",
+--             w = 50
+--         },
+--         position = {
+--             "center",
+--             w = 50
+--         } -- TODO: remove
+--         -- realtime = false,debounce = 0.1
+--     }
+-- end
 
 local function entry(_)
     -- local _permit = ya.hide()
